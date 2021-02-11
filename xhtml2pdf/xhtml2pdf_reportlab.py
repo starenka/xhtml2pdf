@@ -120,10 +120,15 @@ class PmlBaseDoc(BaseDocTemplate):
     def afterFlowable(self, flowable):
         # Does the flowable contain fragments?
         if getattr(flowable, "outline", False):
+            style = flowable.style.name
+
+            key = '%s-%s' % (style, self.seq.nextf(style.lower()))
+            self.canv.bookmarkPage(key)
             self.notify('TOCEntry', (
                 flowable.outlineLevel,
                 html_escape(copy.deepcopy(flowable.text), 1),
-                self.page))
+                self.page,
+                key))
 
     def handle_nextPageTemplate(self, pt):
         '''
@@ -784,7 +789,7 @@ class PmlPageCount(IndexingFlowable):
 
 
 class PmlTableOfContents(TableOfContents):
-    def wrap(self, availWidth, availHeight):
+    def wrapx(self, availWidth, availHeight):
         """
         All table properties should be known by now.
         """
